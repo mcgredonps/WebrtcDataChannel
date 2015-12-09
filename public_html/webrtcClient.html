@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>WebRTC Client</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+        
+        <script type="text/javascript">
+          
+          // There are two options for the rendezvous server. Option one
+          // is to connect to the prefab one run on the cloud.
+          // 
+          // This is our connection to the cloud rendezvous server, in this case
+          // on the cloud. We will connect to this, and request a connection
+          // to a known ID, in our case "mv3500". 
+          //var client = new Peer({ key: 'lwjd5qra8257b9'}); //, debug: 3});
+          
+          // This is the local peerjs server option. It's started up in
+          // the directory peerjs-server-master/bin with
+          // ./peerjs --port 9000.
+          // This requires that nodejs and npm be installed on your machine.
+          // It may also require the installation of some npm packages. Basically,
+          // if you get a "package not found" error, type npm install <packageName>.
+          var client = new Peer({host: 'localhost', port: 9000, path: '/'});
+          
+          // From the rendezvous server, we request a connection to the page
+          // that established an ID of "mv3500". We get back a not necessarily
+          // yet fully connected DataConnection object. Once the "open" event
+          // handler fires we can actually send data across it.
+          var dataConnection = client.connect("mv3500");
+          
+          // Set up the event handlers.
+      
+          // Once the 'open' callback fires we have a connection to the other web page,
+          // and can send and receive data. 
+          dataConnection.on("open", function()
+          {
+              // Now that we have an open connection, send some data. If we
+              // tried this before the 'open' event handler has fired we'd
+              // likely get an error.
+             dataConnection.send("From client"); 
+          });
+          
+          // The event handler that fires when the other side sends us data.
+          // In this case we are using strings, but we can also use binary
+          // data. In the context of DIS, we could receive and decode PDUs
+          // here.
+          dataConnection.on("data", function(data)
+          {
+            console.log("Got data from server", data); 
+           });
+           
+           
+          
+           
+    
+        </script>
+    </head>
+    
+    <body>
+        <div>This uses peerjs, (peerjs.com), a javascript framework that
+            simplifies using WebRTC data channels.  </div><p>
+                
+            Works in conjuction with the webrtcServer.html page. You should
+            run that first. When the webrtcServer page runs, it establishes
+            an ID on the server side, "mv3500", that we know to connect
+            to. <p>
+            
+            See the source code, and see http://peerjs.com/docs/ for API information.
+        </p>
+    </body>
+</html>
+

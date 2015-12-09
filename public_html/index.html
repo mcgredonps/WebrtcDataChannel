@@ -1,0 +1,60 @@
+<html>
+    
+    <body>
+        <h2> WebRTC data channel example</h2>
+        
+        <p>
+            
+        This is a somewhat contrived but minimally simple example of using 
+        the WebRTC data channel capability. This is effectively unicast UDP sockets
+        for the web.<p>
+         
+        This uses the peerjs package to simplify the code. See http://peerjs.com/
+        for details, or http://peerjs.com/docs/ for the API documents. The two
+        web pages, webrtcServer.html and webrtcClient.html, require that a peerjs
+        "rendezvous" server be running. This server can be run in two ways. The
+        first is to rely on a server in the cloud provided by peerjs. However, this
+        server uses a non-standard port, and access is blocked by the NPS firewall.
+        The other way is to run a peerjs server yourself. This requires that nodejs
+        and npm (node package manager) be installed on your machine. Take your pick
+        on which is easier for you.
+        
+        By default the code here assumes you are running a local server. To start
+        the server, cd to peerjs-server-master/bin and start the peerjs server
+        with (on unix) ./peerjs --port 9000. Initally it may complain that packages
+        or modules are missing. Add them with "npm install <packageName>". After
+            four or five iterations of this the server will start up.<p>
+        
+        If you don't want to run the peerjs server and are outside the firewall,
+        you can uncomment the line<p>
+        
+        var serverPeer = new Peer("mv3500", {key:'lwjd5qra8257b9'});
+            <p>
+        and comment out the line
+            <p>
+        var serverPeer = new Peer("mv3500", {host: 'localhost', port: 9000, path: '/'});
+            <p>
+        in webrtcServer.html, and uncomment the line
+            <p>
+        var client = new Peer({ key: 'lwjd5qra8257b9'}); 
+            <p>
+        and comment out the line
+            <p>
+        var client = new Peer({host: 'localhost', port: 9000, path: '/'});
+        <p>
+        in webrtcClient.html.
+        
+            <h2> To run</h2>
+            
+            <list>
+            <li> Start the peerjs server with "./peerjs --port 9000"
+                
+            <li> Open the web page webrtcServer.html. You can just open this with file:///
+            <li> Open the web page webrtcClient.html. 
+                </list>
+                <p>
+            The two web pages will exchange information over UDP 
+        
+        
+    </body>
+</html>

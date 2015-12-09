@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>WebRTC Server</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+        
+        <script type="text/javascript">
+          
+           // There are two possible ways to connect to the rendezvous
+           // server: either a server provided by peerjs in the cloud,
+           // or a locally run server. 
+           
+           // First option: cloud.
+           
+           // With no URL, this connects to a peerjs server on the cloud,
+           // using the provided, public API key. The Peer object is used
+           // to provide a rendevous point with other participants. The
+           // first argument passed in, in this case "mv3500", should be
+           // unique--errors will occur if you provide a non-unique ID.
+           // If you omit the ID an ID will be generated for you on the
+           // server side.
+           
+           // Note that the cloud-side server establishes a connection
+           // on a non-standard port, I think 9000. This will be blocked
+           // inside NPS, which means this will only work outside NPS.
+           //var serverPeer = new Peer("mv3500", {key:'lwjd5qra8257b9'});
+           
+           
+           // This is the local peerjs server option. It's started up in
+           // the directory peerjs-server-master/bin with
+           // ./peerjs --port 9000.
+           // This requires that nodejs and npm be installed on your machine.
+           // It may also require the installation of some npm packages. Basically,
+           // if you get a "package not found" error, type npm install <packageName>.
+          
+           var serverPeer = new Peer("mv3500", {host: 'localhost', port: 9000, path: '/'});
+           
+           // This is the object that actually passes data between partipants.
+           var dataConnection;
+             
+           // Not really necessary. Creating the peer object above does not
+           // necessarily happen right away. When the object is finished 
+           // being created, this function is called to notify us. At this 
+           // point we have a connection to the rendevous server.
+           serverPeer.on('open', function(id)
+           {
+               console.log("opened server peer, unique id=" + id);
+           });
+           
+           // When another web page establishes a connection, by requesting
+           // a connection to the ID "mv3500", ie us, this event
+           // handler fires. In the callback function we get passed a
+           // DataConnection object, which can send and receive data with
+           // the peer.
+           serverPeer.on('connection', function(connection)
+           {
+               dataConnection = connection;
+               console.log("got connection on server side");
+               
+               // Set up event handlers for the DataConnection object. 
+               // Possible events are data, open, close, and error.
+               
+               // The other web page has sent us data. Print it out,
+               // and send some data back.
+               dataConnection.on('data', function(data) 
+               {
+                  console.log("Got data from client:", data); 
+                  dataConnection.send("Hello from server");
+               });
+           });
+           
+          
+           
+    
+        </script>
+    </head>
+    
+    <body>
+        <div>This uses peerjs, (peerjs.com), a javascript framework that
+            simplifies using WebRTC data channels.<p>
+                
+            This can use (by commenting out one line and uncommenting
+            another) either a rendezvous server in the cloud or or a 
+            rendezvous server run on this host. 
+            
+            The cloud rendezvous server uses a non-standard port, and the NPS firewall will block
+            access. So to use that you'll have to be outside the firewall.<p>
+                
+            The local server option requires that the peerjs server be started
+            up on this machine. That in turn requires that nodejs and npm be
+            installed on this machine. In the peerjs-server-master/bin directory,
+            start up the server with "./peerjs --port 9000". Intially you may
+            get errors on startup that say a package or module is missing. You
+            can iteratively solve this by typing "npm install <packageName>"
+            to install the missing module. After four of five iterations of this
+            the server should start cleanly, and you won't have to issue those
+            commands again.<p>
+                
+            Calling this web page a "server" is a bit of a stretch. What it does
+            is connect to the rendezvous server and register a known name
+            or ID.  Connections from other web pages to the rendezvous server can request
+            a connection to that ID. When that happens the Peer object's 
+            'connection' event handler in this page fires, and a DataConnection
+            object is passed in the callback.
+            
+            <p>
+                See the source code, and see http://peerjs.com/docs/ for API
+                info.
+               
+            
+            
+            </p>  </div>
+    </body>
+</html>
+
